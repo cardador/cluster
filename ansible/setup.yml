@@ -1,0 +1,35 @@
+---
+- hosts: all
+  become: yes
+  become_method: sudo
+  tasks:
+
+    - name: Install Nginx
+      apt: pkg=nginx state=latest update_cache=true
+
+    - name: Install Tcpdump
+      apt: pkg=tcpdump state=latest update_cache=true
+
+    - name: Create directories for nginx
+      file: path=/data/www state=directory
+
+    - name: Copy the configuration to the backend servers
+      template: src=backend/nginx.conf dest=/etc/nginx/nginx.conf
+
+    - name: Copy the index files to the backend servers
+      template: src=backend/index.html dest=/etc/nginx/nginx.conf
+
+    - name: Reload Nginx
+      service: name=nginx state=restarted
+
+
+- hosts: node1
+  become: yes
+  become_method: sudo
+  tasks:
+
+    - name: Copy the configuration to the loadbalancer
+      template: src=lb/nginx.conf dest=/etc/nginx/nginx.conf
+
+    - name: Reload Nginx
+      service: name=nginx state=restarted

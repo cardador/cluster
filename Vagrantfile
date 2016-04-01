@@ -6,20 +6,25 @@
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
 Vagrant.configure(2) do |config|
-	config.vm.define "lb" do |lb|
-		lb.vm.box = "ubuntu/trusty64"
-		lb.vm.network "private_network", ip: "192.168.50.10"
-	end
-	config.vm.define "node1" do |node1|
-		node1.vm.box = "ubuntu/trusty64"
-		node1.vm.network "private_network", ip: "192.168.50.11"
-	end
-	config.vm.define "node2" do |node2|
-		node2.vm.box = "ubuntu/trusty64"
-		node2.vm.network "private_network", ip: "192.168.50.12"
-	end
-	config.vm.define "node3" do |node3|
-		node3.vm.box = "ubuntu/trusty64"
-		node3.vm.network "private_network", ip: "192.168.50.13"
+	N = 4
+	(1..N).each do |machine_id|
+  	config.vm.define "node#{machine_id}" do |node|
+			node.vm.box = "ubuntu/trusty64"
+    	node.vm.hostname = "node#{machine_id}"
+    	node.vm.network "private_network", ip: "192.168.77.#{20+machine_id}"
+			# Set port forward for the load balancer	
+			if machine_id == 1
+				node.vm.network "forwarded_port", guest: 80, host: 8080
+			end
+    	# Only execute the Ansible provisioner once,
+    	# when all the nodes are up and ready.
+    	if machine_id == N
+      	node.vm.provision :ansible do |ansible|
+        	# Disable default limit to connect to all the machines
+        	ansible.limit = "all"
+      		ansible.playbook = "ansible/setup.yml"
+      	end
+    	end
+  	end
 	end
 end
