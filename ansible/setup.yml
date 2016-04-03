@@ -17,7 +17,7 @@
       template: src=backend/nginx.conf dest=/etc/nginx/nginx.conf
 
     - name: Copy the index files to the backend servers
-      template: src=backend/index.html dest=/etc/nginx/nginx.conf
+      template: src=backend/index.html dest=/data/www/index.html
 
     - name: Reload Nginx
       service: name=nginx state=restarted

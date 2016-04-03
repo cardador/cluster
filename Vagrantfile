@@ -14,7 +14,7 @@ Vagrant.configure(2) do |config|
     	node.vm.network "private_network", ip: "192.168.77.#{20+machine_id}"
 			# Set port forward for the load balancer	
 			if machine_id == 1
-				node.vm.network "forwarded_port", guest: 80, host: 8080
+				node.vm.network "forwarded_port", guest: 80, host: 6666
 			end
     	# Only execute the Ansible provisioner once,
     	# when all the nodes are up and ready.
